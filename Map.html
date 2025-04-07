@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Live AQI Tracker</title>
+
+  <!-- Chart.js with date adapter -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #fff);
+      padding: 2rem;
+      text-align: center;
+    }
+    h1 {
+      color: #00796b;
+    }
+    .city-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    .aqi-box {
+      padding: 1.5rem;
+      border-radius: 12px;
+      background-color: #ffffff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      min-width: 220px;
+    }
+    .aqi-value {
+      font-size: 2rem;
+      font-weight: bold;
+    }
+    .good { color: green; }
+    .moderate { color: orange; }
+    .unhealthy { color: red; }
+    canvas {
+      margin-top: 3rem;
+    }
+    .pollutants p {
+      margin: 0.3rem 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🌫️ Live AQI Data for Cities</h1>
+  <div class="city-container" id="cityContainer"></div>
+  <canvas id="aqiChart" width="800" height="400"></canvas>
+  <canvas id="barChart" width="800" height="400"></canvas>
+
+  <script>
+    const API_KEY = "306f5a21f4611bca4f7a86231be36c38";
+
+    const cities = [
+      { name: "Pune", lat: 18.5204, lon: 73.8567 },
+      { name: "Kolhapur", lat: 16.7050, lon: 74.2433 },
+      { name: "Mumbai", lat: 19.0760, lon: 72.8777 },
+      { name: "Ichalkaranji", lat: 16.6916, lon: 74.4608 },
+      { name: "Sangli", lat: 16.8544, lon: 74.5815 }
+    ];
+
+    function calculateAQI_PM25(pm) {
+      const breakpoints = [
+        { cLow: 0.0, cHigh: 12.0, aqiLow: 0, aqiHigh: 50 },
+        { cLow: 12.1, cHigh: 35.4, aqiLow: 51, aqiHigh: 100 },
+        { cLow: 35.5, cHigh: 55.4, aqiLow: 101, aqiHigh: 150 },
+        { cLow: 55.5, cHigh: 150.4, aqiLow: 151, aqiHigh: 200 },
+        { cLow: 150.5, cHigh: 250.4, aqiLow: 201, aqiHigh: 300 },
+        { cLow: 250.5, cHigh: 350.4, aqiLow: 301, aqiHigh: 400 },
+        { cLow: 350.5, cHigh: 500.4, aqiLow: 401, aqiHigh: 500 }
+      ];
+
+      for (let bp of breakpoints) {
+        if (pm >= bp.cLow && pm <= bp.cHigh) {
+          return Math.round(
+            ((bp.aqiHigh - bp.aqiLow) / (bp.cHigh - bp.cLow)) * (pm - bp.cLow) + bp.aqiLow
+          );
+        }
+      }
+      return "N/A";
+    }
+
+    function getStatus(aqi) {
+      if (aqi === "N/A") return { text: "Unavailable", class: "" };
+      if (aqi <= 50) return { text: "Good", class: "good" };
+      if (aqi <= 100) return { text: "Moderate", class: "moderate" };
+      return { text: "Unhealthy", class: "unhealthy" };
+    }
+
+    async function fetchAQIData(city) {
+      try {
+        const res = await fetch(
+          `https://api.openweathermap.org/data/2.5/air_pollution/forecast?lat=${city.lat}&lon=${city.lon}&appid=${API_KEY}`
+        );
+        const data = await res.json();
+        return data.list.map(entry => ({
+          time: new Date(entry.dt * 1000),
+          pm25: entry.components.pm2_5
+        }));
+      } catch (error) {
+        console.error(`Error fetching AQI data for ${city.name}:`, error);
+        return [];
+      }
+    }
+
+    async function updateCityAQI(city) {
+      const forecastData = await fetchAQIData(city);
+
+      // Current AQI from latest pollutant data
+      let pollutantInfo = '';
+      let currentAQI = "N/A";
+      try {
+        const res = await fetch(
+          `https://api.openweathermap.org/data/2.5/air_pollution?lat=${city.lat}&lon=${city.lon}&appid=${API_KEY}`
+        );
+        const pollutantData = await res.json();
+        const components = pollutantData.list[0]?.components || {};
+        const pm25 = components.pm2_5 ?? 0;
+
+        currentAQI = calculateAQI_PM25(pm25);
+
+        pollutantInfo = `
+          <div class="pollutants">
+            <p>PM2.5: ${components.pm2_5 || 'N/A'} µg/m³</p>
+            <p>PM10: ${components.pm10 || 'N/A'} µg/m³</p>
+            <p>CO: ${components.co || 'N/A'} µg/m³</p>
+            <p>NO₂: ${components.no2 || 'N/A'} µg/m³</p>
+            <p>O₃: ${components.o3 || 'N/A'} µg/m³</p>
+          </div>
+        `;
+      } catch (err) {
+        console.error("Error fetching pollutants:", err);
+      }
+
+      const aqiSeries = forecastData.map(d => calculateAQI_PM25(d.pm25));
+      const minAQI = aqiSeries.length ? Math.min(...aqiSeries) : "N/A";
+      const maxAQI = aqiSeries.length ? Math.max(...aqiSeries) : "N/A";
+
+      const status = getStatus(currentAQI);
+
+      const box = document.createElement("div");
+      box.className = "aqi-box";
+      box.innerHTML = `
+        <p><strong>City:</strong> ${city.name}</p>
+        <p><strong>Current AQI:</strong> <span class="aqi-value ${status.class}">${currentAQI}</span></p>
+        <p>Air Quality is: ${status.text}</p>
+        <p>Min AQI (24h): ${minAQI}</p>
+        <p>Max AQI (24h): ${maxAQI}</p>
+        ${pollutantInfo}
+      `;
+      document.getElementById("cityContainer").appendChild(box);
+
+      return {
+        city: city.name,
+        aqiData: forecastData.map(d => ({
+          time: d.time,
+          aqi: calculateAQI_PM25(d.pm25)
+        })),
+        currentAQI
+      };
+    }
+
+    async function renderLineChart(allCityData) {
+      const ctx = document.getElementById("aqiChart").getContext("2d");
+
+      const colors = ['#4caf50', '#ff9800', '#f44336', '#2196f3', '#9c27b0'];
+      const datasets = allCityData.map((cityData, index) => ({
+        label: cityData.city,
+        data: cityData.aqiData.map(entry => ({
+          x: entry.time,
+          y: entry.aqi
+        })),
+        borderColor: colors[index % colors.length],
+        tension: 0.3,
+        fill: false
+      }));
+
+      new Chart(ctx, {
+        type: 'line',
+        data: { datasets },
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Hourly AQI Variation (Next 24 Hours)'
+            },
+            legend: {
+              position: 'top'
+            }
+          },
+          scales: {
+            x: {
+              type: 'time',
+              time: {
+                unit: 'hour',
+                tooltipFormat: 'MMM dd, h a'
+              },
+              title: {
+                display: true,
+                text: 'Time'
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'AQI Level'
+              },
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+    async function renderBarChart(allCityData) {
+      const ctx = document.getElementById("barChart").getContext("2d");
+
+      const labels = allCityData.map(d => d.city);
+      const aqiValues = allCityData.map(d => d.currentAQI);
+      const bgColors = aqiValues.map(val => {
+        if (val <= 50) return 'green';
+        if (val <= 100) return 'orange';
+        return 'red';
+      });
+
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Current AQI',
+            data: aqiValues,
+            backgroundColor: bgColors
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Current AQI Comparison by City'
+            },
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'AQI Value'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    async function renderCharts() {
+      const allCityData = await Promise.all(cities.map(updateCityAQI));
+      renderLineChart(allCityData);
+      renderBarChart(allCityData);
+    }
+
+    renderCharts();
+  </script>
+
+</body>
+</html>
