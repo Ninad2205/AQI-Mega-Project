@@ -1,60 +1,343 @@
 *{
-    padding: 0%;
-    margin: 0%;
+  padding: 0%;
+  margin: 0%;
 }
 
 .navbar {
-    display: flex;
-    justify-content:space-between;
-    align-items: center;
-    background-color: white;
-    padding: 15px 40px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-  }
-  
-  .nav-logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1.5rem;
+  display: flex;
+  justify-content:space-between;
+  align-items: center;
+  background-color: rgb(26, 41, 80);
+  padding: 15px 40px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: rgb(241, 241, 241);
+}
+
+.nav-logo img {
+  width: 50px;
+  height: 60px;
+}
+.left-nav{
+  list-style: none;
+  display: flex;
+  justify-items: left;
+  border-radius: 5px;
+  height: 20px;
+  width: 190px;
+  background-color: #0077cc;
+  color: white;
+}
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+}
+
+
+.nav-links li a {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: large;
+  transition: color 0.3s;
+}
+
+.nav-links li a:hover {
+  color: #000000;
+  font-size: x-large;
+}
+
+/* after */
+.hero {
+  position: relative;
+  height: 90vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-align: center;
+  overflow: hidden;
+}
+
+.background-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5); 
+  z-index: 1;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+
+.hero h1 {
+  font-size: 3rem;
+  margin-bottom: 15px;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin-bottom: 25px;
+}
+
+.hero-btn {
+  background-color: #0077cc;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.hero-btn:hover {
+  background-color: #005fa3;
+  transform: scale(1.05);
+}
+.hero-content :first-child{
+    font-size: 3rem;
     font-weight: bold;
-    color: #0077cc;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: slideFadeIn 1.5s ease-out forwards;
   }
   
-  .nav-logo img {
-    width: 50px;
-    height: 60px;
+  @keyframes slideFadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-  .left-nav{
-    list-style: none;
+  /* after2 ky msti kru nka tya comments na  */
+  .aqi-scroll-section {
+    padding: 40px 20px;
+    background-color: #f5f5f5;
+  }
+  
+  .aqi-scroll-section h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 2rem;
+  }
+  
+  .aqi-cards {
     display: flex;
-    justify-items: left;
-    border-radius: 5px;
-    height: 20px;
-    width: 190px;
-    background-color: #0077cc;
+    gap: 20px;
+    overflow-x: auto;
+    padding : 10px;
+    scroll-snap-type: x mandatory;
+    margin: 60px;
+    align-items: center;
+  }
+  
+  .aqi-card {
+    min-width: 180px;
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    scroll-snap-align: start;
+    flex-shrink: 0;
+    text-align: center;
+  }
+  
+  .aqi-card h3 {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+  }
+  
+  .aqi-card p {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+  }
+  
+  .aqi-status {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.9rem;
     color: white;
   }
-  .nav-links {
-    list-style: none;
-    display: flex;
-    gap: 25px;
-    margin: 0;
-    padding: 0;
+  
+  .aqi-status.good {
+    background-color: #2ecc71;
+  }
+  .aqi-status.moderate {
+    background-color: #f1c40f;
+  }
+  .aqi-status.unhealthy {
+    background-color: #e74c3c;
+  }
+  /* after3 */
+  .health-tips {
+    padding: 20px;
+    text-align: center;
+    background-color: #fefefe;
+    font-size: larger;
   }
   
-  .nav-links li {
-    text-decoration: none;
+  .health-tips p {
+    font-size: 2.1rem;
+    margin: 8px 0;
     color: #333;
-    font-weight: 500;
-    transition: color 0.3s;
+  }
+  /* 3rchya ntr */
+  .about-aqi {
+    padding: 60px 20px;
+    background-color: #eef7ff;
+    text-align: center;
   }
   
-  .nav-links li:hover {
-    color: #0077cc;
-    font-size: large;
+  .about-aqi .content {
+    max-width: 800px;
+    margin: auto;
   }
+  
+  .about-aqi h2 {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+  }
+  
+  .about-aqi p {
+    font-size: 1.2rem;
+    color: #444;
+  }
+  
+  .aqi-scale {
+    padding: 50px 20px;
+    text-align: center;
+    background: #ffffff;
+  }
+  
+  .aqi-scale h2 {
+    font-size: 2.2rem;
+    margin-bottom: 30px;
+  }
+  
+  .scale-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+  }
+  
+  .scale-box {
+    padding: 20px;
+    border-radius: 10px;
+    color: #fff;
+    font-weight: bold;
+    width: 140px;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  
+  .scale-box span {
+    font-size: 0.9rem;
+    font-weight: normal;
+  }
+  
+  
+  .scale-box.good { background-color: #2ecc71; }
+  .scale-box.moderate { background-color: #f1c40f; color: #000; }
+  .scale-box.unhealthy-sensitive { background-color: #e67e22; }
+  .scale-box.unhealthy { background-color: #e74c3c; }
+  .scale-box.very-unhealthy { background-color: #8e44ad; }
+  .scale-box.hazardous { background-color: #7f0000; }
+  
+  .pollution-sources {
+    padding: 60px 20px;
+    background-color: #f9f9f9;
+    text-align: center;
+  }
+  
+  .pollution-sources h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  .pollution-sources ul {
+    list-style: none;
+    font-size: 1.3rem;
+    padding: 0;
+    color: #444;
+  }
+  
+  .pollution-sources li {
+    margin: 10px 0;
+  }
+  /* 4th */
+  
+.articles {
+background-color: #f0f7fc;
+padding: 60px 20px;
+text-align: center;
+}
+
+.articles h2 {
+font-size: 2.5rem;
+margin-bottom: 40px;
+color: #1a2950;
+}
+
+.article-cards-inline {
+display: flex;
+gap: 30px;
+}
+  
+ 
+  footer {
+    background-color: #1a2950;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    font-size: 0.9rem;
+  }
+  
+  .footer-links a {
+    color: #ccc;
+    text-decoration: none;
+    margin: 0 8px;
+  }
+  
+  .footer-links a:hover {
+    text-decoration: underline;
+  }
+  
+  
   
