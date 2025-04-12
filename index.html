@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Live AQI Tracker</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #fff);
+      padding: 2rem;
+      text-align: center;
+    }
+    h1 {
+      color: #00796b;
+    }
+    .city-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    .aqi-box {
+      padding: 1.5rem;
+      border-radius: 12px;
+      background-color: #ffffff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      min-width: 260px;
+    }
+    .aqi-value {
+      font-size: 2rem;
+      font-weight: bold;
+    }
+    .good { color: green; }
+    .moderate { color: orange; }
+    .unhealthy { color: red; }
+    .very-unhealthy { color: purple; }
+    .hazardous { color: maroon; }
+  </style>
+</head>
+<body>
+
+  <h1>🌫️ Live AQI Data for Cities</h1>
+  <div class="city-container" id="cityContainer">
+    <!-- City AQI cards will be inserted here -->
+  </div>
+
+  <script>
+    const API_KEY = "306f5a21f4611bca4f7a86231be36c38";
+
+    const cities = [
+      { name: "Pune", lat: 18.5204, lon: 73.8567 },
+      { name: "Kolhapur", lat: 16.7050, lon: 74.2433 },
+      { name: "Mumbai", lat: 19.0760, lon: 72.8777 },
+      { name: "Ichalkaranji", lat: 16.6916, lon: 74.4608 },
+      { name: "Sangli", lat: 16.8544, lon: 74.5815 }
+    ];
+
+    function getAQIStatus(aqi) {
+      if (aqi <= 50) return { text: "Good", class: "good" };
+      if (aqi <= 100) return { text: "Moderate", class: "moderate" };
+      if (aqi <= 150) return { text: "Unhealthy for Sensitive Groups", class: "unhealthy" };
+      if (aqi <= 200) return { text: "Unhealthy", class: "unhealthy" };
+      if (aqi <= 300) return { text: "Very Unhealthy", class: "very-unhealthy" };
+      return { text: "Hazardous", class: "hazardous" };
+    }
+
+    function calculateAQI(pm25) {
+      const breakpoints = [
+        { concentration: 12.0, aqiLow: 0, aqiHigh: 50 },
+        { concentration: 35.4, aqiLow: 51, aqiHigh: 100 },
+        { concentration: 55.4, aqiLow: 101, aqiHigh: 150 },
+        { concentration: 150.4, aqiLow: 151, aqiHigh: 200 },
+        { concentration: 250.4, aqiLow: 201, aqiHigh: 300 },
+        { concentration: 500.4, aqiLow: 301, aqiHigh: 500 }
+      ];
+
+      for (let i = 0; i < breakpoints.length; i++) {
+        const bp = breakpoints[i];
+        if (pm25 <= bp.concentration) {
+          const Clow = i === 0 ? 0 : breakpoints[i - 1].concentration;
+          const Chigh = bp.concentration;
+          const Ilow = bp.aqiLow;
+          const Ihigh = bp.aqiHigh;
+          return Math.round(((Ihigh - Ilow) / (Chigh - Clow)) * (pm25 - Clow) + Ilow);
+        }
+      }
+
+      return null;
+    }
+
+    async function getAQI(city) {
+      try {
+        const res = await fetch(
+          `https://api.openweathermap.org/data/2.5/air_pollution?lat=${city.lat}&lon=${city.lon}&appid=${API_KEY}`
+        );
+        const data = await res.json();
+        console.log(`Data for ${city.name}:`, data);
+
+        const pm25 = data.list[0]?.components?.pm2_5;
+
+        const box = document.createElement("div");
+        box.className = "aqi-box";
+
+        if (pm25 === undefined || pm25 === null) {
+          box.innerHTML = `
+            <p><strong>City:</strong> ${city.name}</p>
+            <p style="color:gray;">AQI data not available</p>
+          `;
+        } else {
+          const aqi = calculateAQI(pm25);
+          const status = getAQIStatus(aqi);
+          box.innerHTML = `
+            <p><strong>City:</strong> ${city.name}</p>
+            <p><strong>AQI:</strong> <span class="aqi-value ${status.class}">${aqi}</span></p>
+            <p>Air Quality: ${status.text}</p>
+            <p><small>PM2.5: ${pm25} µg/m³</small></p>
+          `;
+        }
+
+        document.getElementById("cityContainer").appendChild(box);
+      } catch (error) {
+        console.error(`Error fetching AQI for ${city.name}:`, error);
+      }
+    }
+
+    cities.forEach(getAQI);
+  </script>
+
+</body>
+</html>

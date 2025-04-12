@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Signup</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Minified Bootstrap CSS from CDN -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Minified Bootstrap Icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <style>
+      /* Make the body cover the entire viewport */
+      body,
+      html {
+        height: 100%;
+        margin: 0;
+        font-family: Arial, sans-serif;
+      }
+
+      /* Center the signup container vertically and horizontally */
+      .signup-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh; /* Full viewport height */
+        padding: 20px; /* Padding for smaller devices */
+        background-color: white;
+      }
+
+      /* Signup form styles */
+      .signup-form {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 700px; /* Restrict max width for large screens */
+      }
+
+      h3.signup-heading {
+        font-size: 2rem;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 25px;
+        background: linear-gradient(90deg, #0072ff, #b900b4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .form-label {
+        font-weight: 500;
+      }
+
+      .form-control:focus {
+        border-color: #0072ff;
+        box-shadow: none;
+      }
+
+      .btn-signup {
+        background: linear-gradient(90deg, #0072ff, #b900b4);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      }
+
+      .btn-signup:hover {
+        opacity: 0.8;
+        color: white;
+      }
+
+      .input-group-text {
+        background-color: #fff;
+        border-left: none;
+        cursor: pointer;
+      }
+
+      .input-group .form-control {
+        border-right: none;
+      }
+
+      .input-group .form-control:focus {
+        box-shadow: none;
+      }
+
+      .btn-back {
+        background-color: black;
+        border: none;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      }
+
+      /* Responsive Design for smaller screens */
+      @media (max-width: 768px) {
+        h3.signup-heading {
+          font-size: 1.5rem;
+        }
+      }
+      .flash-message {
+        transition: all 0.6s ease;
+        overflow: hidden;
+      }
+      
+    </style>
+  </head>
+
+  <body>
+    <div class="signup-container">
+      <div class="signup-form">
+        <h3 class="signup-heading">Create Your Account</h3>
+
+        <!-- Flash Messages -->
+        <!-- Flash Messages -->
+        <% if (messages && messages.length > 0) { %>
+        <div class="alert alert-danger">
+          <% messages.forEach(message => { %>
+          <p><%= message %></p>
+          <% }); %>
+        </div>
+        <% } %>
+
+        <form action="/signup" method="POST">
+          <div class="row">
+            <div class="col-md-6 col-12 mb-3">
+              <label for="firstName" class="form-label">First Name</label>
+              <input
+                type="text"
+                class="form-control"
+                name="firstName"
+                required
+                pattern="[A-Za-z]+"
+                title="Please enter only alphabetic characters."
+              />
+            </div>
+            <div class="col-md-6 col-12 mb-3">
+              <label for="lastName" class="form-label">Last Name</label>
+              <input
+                type="text"
+                class="form-control"
+                name="lastName"
+                required
+                pattern="[A-Za-z]+"
+                title="Please enter only alphabetic characters."
+              />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 col-12 mb-3">
+              <label for="emailId" class="form-label">Email</label>
+              <input
+                type="email"
+                class="form-control"
+                name="emailId"
+                required
+                pattern="^[a-zA-Z0-9._%+-]+@gmail\.com$"
+                title="Please enter a valid Gmail address (example: user@gmail.com)"
+              />
+            </div>
+            <div class="col-md-6 col-12 mb-3">
+              <label for="password" class="form-label">Password</label>
+              <div class="input-group">
+                <input
+                  type="password"
+                  class="form-control"
+                  name="password"
+                  id="passwordInput"
+                  required
+                />
+                <span class="input-group-text" id="togglePassword">
+                  <i class="bi bi-eye-fill" id="toggleIcon"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 col-12 mb-3">
+              <label for="mobileNumber" class="form-label">Mobile Number</label>
+              <input
+                type="text"
+                class="form-control"
+                name="mobileNumber"
+                required
+                pattern="^\d{10}$"
+                title="Please enter a valid 10-digit mobile number."
+              />
+            </div>
+            <div class="col-md-6 col-12 mb-3">
+              <label for="organizationName" class="form-label"
+                >Organization Name</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                name="organizationName"
+                required
+                pattern="[A-Za-z\s]+"
+                title="Please enter only alphabetic characters and spaces."
+              />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-signup w-100">Sign Up</button>
+        </form>
+
+        <!-- Links below the form -->
+        <div class="mt-3 text-center">
+          <a
+            href="javascript:history.back()"
+            class="btn btn-back btn-secondary btn-sm w-60"
+            >Back</a
+          >
+          <p class="mt-2">
+            Already have an account?
+            <a href="/login" class="text-primary">Login</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Load JavaScript resources efficiently -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+      defer
+    ></script>
+
+    <!-- Password Toggle Script -->
+    <script>
+      // Password Toggle Script
+      const togglePassword = document.getElementById("togglePassword");
+      const passwordInput = document.getElementById("passwordInput");
+      const toggleIcon = document.getElementById("toggleIcon");
+    
+      togglePassword.addEventListener("click", () => {
+        const type =
+          passwordInput.getAttribute("type") === "password" ? "text" : "password";
+        passwordInput.setAttribute("type", type);
+        toggleIcon.classList.toggle("bi-eye-fill");
+        toggleIcon.classList.toggle("bi-eye-slash-fill");
+      });
+    
+      // Flash Message Auto-Disappear Script
+      window.onload = function () {
+        const flashMessage = document.querySelector('.alert');
+        if (flashMessage) {
+          setTimeout(() => {
+            flashMessage.style.opacity = '0';
+            flashMessage.style.visibility = 'hidden';
+            flashMessage.style.height = '0';
+            flashMessage.style.margin = '0';
+            flashMessage.style.padding = '0';
+          }, 3000);
+        }
+      };
+    </script>
+    
+  </body>
+</html>
