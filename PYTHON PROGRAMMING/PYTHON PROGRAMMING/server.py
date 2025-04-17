@@ -5,7 +5,7 @@ import requests
 app = Flask(__name__)
 CORS(app)
 
-API_KEY = "84f4e0b475d6778cd954658b20c84e29"
+API_KEY = "306f5a21f4611bca4f7a86231be36c38"
 
 # Define CPCB breakpoints for PM2.5 and PM10 (extendable)
 CPCB_BREAKPOINTS = {

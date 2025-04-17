@@ -152,9 +152,6 @@ app.get('/dashboard', (req, res) => {
 });
 
 
-// app.get('/calculate', (req, res) => {
-//   res.render('calculate');
-// });
 
 
 // Start Server

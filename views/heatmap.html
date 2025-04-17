@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AQInow</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body, html { margin: 0; padding: 0; width: 100%; height: 100%; }
+    #map { width: 100%; height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+  <script>
+    const apiKey = "306f5a21f4611bca4f7a86231be36c38"; // Your API key
+
+    const map = L.map("map").setView([19.7515, 75.7139], 6);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(map);
+
+    const cities = [
+      { name: "Mumbai", coords: [19.0760, 72.8777] },
+      { name: "Pune", coords: [18.5204, 73.8567] },
+      { name: "Navi Mumbai", coords: [19.2183, 73.0865] },
+      { name: "Nashik", coords: [20.0059, 73.7642] },
+      { name: "Aurangabad", coords: [19.8497, 75.8864] },
+      { name: "Nagpur", coords: [21.1458, 79.0882] },
+      { name: "Kolhapur", coords: [16.8524, 74.5815] },
+      { name: "Latur", coords: [18.4075, 76.5604] },
+      { name: "Solapur", coords: [17.6805, 75.9179] },
+      { name: "Nanded", coords: [19.2701, 76.7754] },
+      { name: "Amravati", coords: [20.9374, 77.7796] },
+      { name: "Jalgaon", coords: [21.0077, 75.5626] },
+      { name: "Parbhani", coords: [19.2686, 76.7708] },
+      { name: "Satara", coords: [17.6800, 74.0183] },
+      { name: "Ratnagiri", coords: [16.9944, 73.3000] },
+      { name: "Akola", coords: [20.7059, 77.0083] },
+      { name: "Baramati", coords: [18.1510, 74.5777] },
+      { name: "Beed", coords: [18.9891, 75.7601] },
+      { name: "Sangli", coords: [16.8660, 74.5667] },
+      { name: "Dhule", coords: [20.9042, 74.7749] },
+      { name: "Wardha", coords: [20.7453, 78.6022] },
+      { name: "Hingoli", coords: [19.7149, 77.1519] },
+      { name: "Osmanabad", coords: [18.1810, 76.0419] },
+      { name: "Buldhana", coords: [20.5293, 76.1842] },
+      { name: "Jalna", coords: [19.8410, 75.8864] },
+      { name: "Yavatmal", coords: [20.3893, 78.1307] },
+      { name: "Chandrapur", coords: [19.9615, 79.2961] },
+      { name: "Gadchiroli", coords: [20.1019, 80.0000] },
+      { name: "Washim", coords: [20.1112, 77.1349] },
+      { name: "Panvel", coords: [18.9880, 73.1100] },
+      { name: "Thane", coords: [19.2183, 72.9781] }
+    ];
+
+    const gradient = {
+      0.1: "green",
+      0.3: "yellow",
+      0.5: "orange",
+      0.7: "red",
+      0.9: "purple"
+    };
+
+    const heatLayer = L.heatLayer([], {
+      radius: 50,
+      blur: 25,
+      maxZoom: 7,
+      gradient: gradient
+    }).addTo(map);
+
+    let index = 0;
+    let cityAQIData = [];
+
+    async function fetchAQI(lat, lon, city) {
+      const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`;
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        const aqi = data.list[0].main.aqi;
+        const convertedAQI = aqi * 60;
+
+        cityAQIData.push({
+          lat,
+          lon,
+          aqi: convertedAQI,
+          name: city
+        });
+      } catch (error) {
+        console.error(`Error fetching AQI for ${city}:`, error);
+      }
+    }
+
+    async function initHeatmap() {
+      for (const city of cities) {
+        await fetchAQI(city.coords[0], city.coords[1], city.name);
+      }
+
+      animateHeatmap();
+      setInterval(animateHeatmap, 1200);
+    }
+
+    function animateHeatmap() {
+      if (index >= cityAQIData.length) {
+        index = 0;
+        heatLayer.setLatLngs([]);
+      }
+
+      const point = cityAQIData[index];
+      heatLayer.addLatLng([point.lat, point.lon, point.aqi / 300]);
+
+      const popup = L.popup()
+        .setLatLng([point.lat, point.lon])
+        .setContent(`<b>${point.name}</b><br>AQI: ${Math.round(point.aqi)}`)
+        .openOn(map);
+
+      index++;
+    }
+
+    initHeatmap();
+  </script>
+</body>
+</html>

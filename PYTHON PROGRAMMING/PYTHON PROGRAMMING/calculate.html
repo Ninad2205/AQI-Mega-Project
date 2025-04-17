@@ -1,21 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Indian AQI Calculator</title>
+  <meta charset="UTF-8" />
+  <title>AQInow</title>
   <script src="script.js" defer></script>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #fff);
+      text-align: center;
+    }
+
+    main {
+      flex: 1;
+    }
+
+    h1 {
+      color: #00796b;
+    }
+
+    .city-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .aqi-box {
+      padding: 1.5rem;
+      border-radius: 12px;
+      background-color: #ffffff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      min-width: 250px;
+    }
+
+    .aqi-value {
+      font-size: 2rem;
+      font-weight: bold;
+    }
+
+    .good {
+      color: green;
+    }
+
+    .moderate {
+      color: orange;
+    }
+
+    .unhealthy {
+      color: red;
+    }
+
+    .pollutants p {
+      margin: 0.3rem 0;
+    }
+
+    .navbar {
+      background-color: rgb(26, 41, 80);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-left: 2vh;
+      font-size: 1.9rem;
+      font-weight: bold;
+      color: rgb(241, 241, 241);
+    }
+
+    .nav-logo img {
+      width: 40px;
+      height: 40px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .nav-links li a {
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 1rem;
+      transition: color 0.3s ease;
+    }
+
+    .nav-links li a:hover {
+      color: #ffc107;
+    }
+
+    .navbar-toggler {
+      border: none;
+      outline: none;
+    }
+
+    .logout-btn {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      transition: background-color 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      background-color: #c82333;
+    }
+
+    footer {
+      background-color: #1a2950;
+      color: white;
+      padding: 20px 0;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .footer-links a {
+      color: #ccc;
+      text-decoration: none;
+      margin: 0 8px;
+    }
+
+    .footer-links a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .nav-logo {
+        font-size: 1.5rem;
+      }
+
+      .aqi-box {
+        min-width: 90%;
+      }
+    }
+  </style>
 </head>
-<body class="bg-gradient-to-r from-green-100 to-blue-200 min-h-screen flex flex-col items-center justify-center p-6">
-  <div class="bg-white shadow-2xl rounded-2xl p-8 max-w-md w-full text-center">
-    <h1 class="text-3xl font-bold text-blue-700 mb-6">Indian AQI Calculator</h1>
-    <form id="aqiForm" class="space-y-4">
-      <input type="text" id="latitude" placeholder="Latitude" class="w-full px-4 py-2 border rounded-lg">
-      <input type="text" id="longitude" placeholder="Longitude" class="w-full px-4 py-2 border rounded-lg">
-      <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">Get AQI</button>
-    </form>
-    <div id="result" class="mt-6 text-lg font-semibold text-gray-800"></div>
-    <div id="components" class="mt-4 text-sm text-gray-600"></div>
-  </div>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-top py-3">
+    <div class="container-fluid">
+      <div class="nav-logo d-flex align-items-center">
+        <img src="./logo.png" alt="AQInow Logo" />
+        <span class="ms-2 text-white fw-bold fs-4">AQInow</span>
+      </div>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav nav-links">
+          <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="/dashboard">Air Quality</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+          <li class="nav-item"><a class="nav-link" href="#help">Help</a></li>
+        </ul>
+        <div class="d-flex ms-3 align-items-center gap-2">
+          <a href="http://127.0.0.1:5500/PYTHON%20PROGRAMMING/PYTHON%20PROGRAMMING/calculate.html" class="btn btn-warning text-dark fw-semibold">
+            Calculate
+          </a>
+          <form action="/logout" method="POST">
+            <button type="submit" class="logout-btn">Logout</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container my-5">
+    <div class="row justify-content-center">
+      <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+        <div class="bg-white shadow rounded-4 p-4 text-center">
+          <h1 class="h3 fw-bold text-primary mb-4">Indian AQI Calculator</h1>
+          <form id="aqiForm" class="d-grid gap-3">
+            <input type="text" id="latitude" placeholder="Latitude" class="form-control" />
+            <input type="text" id="longitude" placeholder="Longitude" class="form-control" />
+            <button type="submit" class="btn btn-primary">Get AQI</button>
+          </form>
+          <div id="result" class="mt-4 fw-semibold text-dark"></div>
+          <div id="components" class="mt-2 text-muted small"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p class="mb-1">&copy; 2025 AQInow. All rights reserved.</p>
+    <div class="footer-links">
+      <a href="#">Privacy</a> |
+      <a href="#">Terms</a> |
+      <a href="#">Contact</a>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
