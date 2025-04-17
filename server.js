@@ -7,6 +7,8 @@ const flash = require('connect-flash');
 
 const app = express();
 const session = require('express-session');
+app.use(express.static('public'));
+
 app.use(flash());
 app.use(session({
   secret: '8767046619', // Replace with a strong secret in production
@@ -33,7 +35,7 @@ app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
   // Assuming you are passing messages in req.flash()
-  res.render('signup', { messages: req.flash('error') });
+  res.render('main');
 });
 
 app.get('/signup', (req, res) => {
@@ -121,6 +123,17 @@ app.post('/login', async (req, res) => {
   }
 });
 
+app.post('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Error destroying session:', err);
+      return res.redirect('/dashboard'); // or wherever you want to go if logout fails
+    }
+    res.clearCookie('connect.sid'); // optional: clears the session cookie
+    res.redirect('/'); // redirects to home page
+  });
+});
+
 
 // Dashboard route (optional if accessed directly)
 app.get('/dashboard', (req, res) => {
@@ -131,6 +144,17 @@ app.get('/dashboard', (req, res) => {
   res.render('dashboard', { user: req.session.user });
 });
 
+// Route
+app.get('/dashboard', (req, res) => {
+  res.render('aqi', {
+    apiKey: '306f5a21f4611bca4f7a86231be36c38'  // Optional: move to .env for security
+  });
+});
+
+
+// app.get('/calculate', (req, res) => {
+//   res.render('calculate');
+// });
 
 
 // Start Server
