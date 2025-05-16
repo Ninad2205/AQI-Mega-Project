@@ -4,12 +4,194 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AQInow</title>
+  <link rel="icon" type="image/png" href="./logo.png" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #fff);
+      text-align: center;
+    }
+
+    main {
+      flex: 1;
+    }
+
+    h1 {
+      color: #00796b;
+    }
+
+    .city-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .aqi-box {
+      padding: 1.5rem;
+      border-radius: 12px;
+      background-color: #ffffff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      min-width: 250px;
+    }
+
+    .aqi-value {
+      font-size: 2rem;
+      font-weight: bold;
+    }
+
+    .good {
+      color: green;
+    }
+
+    .moderate {
+      color: orange;
+    }
+
+    .unhealthy {
+      color: red;
+    }
+
+    .pollutants p {
+      margin: 0.3rem 0;
+    }
+
+    .navbar {
+      background-color: rgb(26, 41, 80);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-left: 2vh;
+      font-size: 1.9rem;
+      font-weight: bold;
+      color: rgb(241, 241, 241);
+    }
+
+    .nav-logo img {
+      width: 40px;
+      height: 40px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .nav-links li a {
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 1rem;
+      transition: color 0.3s ease;
+    }
+
+    .nav-links li a:hover {
+      color: #ffc107;
+    }
+
+    .navbar-toggler {
+      border: none;
+      outline: none;
+    }
+
+    .logout-btn {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      transition: background-color 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      background-color: #c82333;
+    }
+
+    footer {
+      background-color: #1a2950;
+      color: white;
+      padding: 20px 0;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .footer-links a {
+      color: #ccc;
+      text-decoration: none;
+      margin: 0 8px;
+    }
+
+    .footer-links a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .nav-logo {
+        font-size: 1.5rem;
+      }
+
+      .aqi-box {
+        min-width: 90%;
+      }
+    }
+  </style>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
+    <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-top py-3">
+    <div class="container-fluid">
+      <div class="nav-logo d-flex align-items-center">
+        <img src="./logo.png" alt="AQInow Logo" />
+        <span class="ms-2 text-white fw-bold fs-4">AQInow</span>
+      </div>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav nav-links">
+          <li class="nav-item"><a class="nav-link" href="http://localhost:3000/">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="http://localhost:3000/dashboard">Air Quality</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+          <li class="nav-item"><a class="nav-link" href="#help">Help</a></li>
+        </ul>
+        <div class="d-flex ms-3 align-items-center gap-2">
+          <a href="http://127.0.0.1:5500/PYTHON%20PROGRAMMING/PYTHON%20PROGRAMMING/calculate.html" class="btn btn-warning text-dark fw-semibold">
+            Calculate
+          </a>
+          <form action="/logout" method="POST">
+            <button type="submit" class="logout-btn">Logout</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </nav>
+
   <div id="overlay" class="animate__animated">
     <div>
       <i class="fa fa-map-marker"></i>
@@ -28,6 +210,15 @@
     </div>
   </div>
 
+   <!-- Footer -->
+  <footer>
+    <p class="mb-1">&copy; 2025 AQInow. All rights reserved.</p>
+    <div class="footer-links">
+      <a href="#">Privacy</a> |
+      <a href="#">Terms</a> |
+      <a href="#">Contact</a>
+    </div>
+  </footer>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
   <script src="script.js"></script>
