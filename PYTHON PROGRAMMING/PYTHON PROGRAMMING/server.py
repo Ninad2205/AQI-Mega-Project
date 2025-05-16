@@ -26,15 +26,24 @@ def calculate_subindex(concentration, breakpoints):
             return round(((i_high - i_low) / (c_high - c_low)) * (concentration - c_low) + i_low)
     return None
 
+@app.route("/")
+def home():
+    return "AQI API is running. Use the /aqi endpoint with lat and lon query parameters."
+
 @app.route("/aqi")
 def get_aqi():
     lat = request.args.get("lat")
     lon = request.args.get("lon")
 
+    if not lat or not lon:
+        return jsonify({"error": "Please provide both lat and lon parameters"}), 400
+
     url = f"http://api.openweathermap.org/data/2.5/air_pollution?lat={lat}&lon={lon}&appid={API_KEY}"
     response = requests.get(url)
-    data = response.json()
+    if response.status_code != 200:
+        return jsonify({"error": "Failed to fetch air pollution data"}), response.status_code
 
+    data = response.json()
     components = data["list"][0]["components"]
     pm2_5 = components.get("pm2_5", 0)
     pm10 = components.get("pm10", 0)
